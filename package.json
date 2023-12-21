@@ -16,6 +16,7 @@
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
+    "ethers": "5",
     "prettier": "^3.1.1",
     "tsx": "^4.7.0"
   },
@@ -23,5 +24,8 @@
     "@google-cloud/kms": "^4.0.1",
     "asn1js": "^3.0.5",
     "pkijs": "^3.0.15"
+  },
+  "peerDependencies": {
+    "ethers": "5"
   }
 }
