@@ -19,6 +19,9 @@ devDependencies:
   '@0xsequence/auth':
     specifier: ^1.6.2
     version: 1.6.2(ethers@5.7.2)
+  '@0xsequence/provider':
+    specifier: ^1.6.2
+    version: 1.6.2(ethers@5.7.2)
   '@types/chai':
     specifier: ^4.3.11
     version: 4.3.11
@@ -161,6 +164,28 @@ packages:
       '@0xsequence/relayer': 1.6.2(ethers@5.7.2)
       '@0xsequence/utils': 1.6.2(ethers@5.7.2)
       ethers: 5.7.2
+    dev: true
+
+  /@0xsequence/provider@1.6.2(ethers@5.7.2):
+    resolution: {integrity: sha512-e/xLuxO17iI9xyamqwjZp012wcBDu8mKkKlsjXhG/I7yjOCOmVMwyruhuUleWisQp3bI759Glilj3vT7GDnZIA==}
+    peerDependencies:
+      ethers: '>=5.5 < 6'
+    dependencies:
+      '@0xsequence/abi': 1.6.2
+      '@0xsequence/account': 1.6.2
+      '@0xsequence/auth': 1.6.2(ethers@5.7.2)
+      '@0xsequence/core': 1.6.2(ethers@5.7.2)
+      '@0xsequence/migration': 1.6.2
+      '@0xsequence/network': 1.6.2(ethers@5.7.2)
+      '@0xsequence/relayer': 1.6.2(ethers@5.7.2)
+      '@0xsequence/utils': 1.6.2(ethers@5.7.2)
+      '@0xsequence/wallet': 1.6.2(ethers@5.7.2)
+      ethers: 5.7.2
+      eventemitter2: 6.4.9
+      webextension-polyfill: 0.10.0
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
     dev: true
 
   /@0xsequence/relayer@1.6.2(ethers@5.7.2):
@@ -2630,6 +2655,10 @@ packages:
     engines: {node: '>=6'}
     dev: false
 
+  /eventemitter2@6.4.9:
+    resolution: {integrity: sha512-JEPTiaOt9f04oa6NOkc4aH+nVp5I3wEjpHbIPqfgCdD5v5bUzy7xQqwcVO2aDQgOWhI28da57HksMrzK9HlRxg==}
+    dev: true
+
   /evp_bytestokey@1.0.3:
     resolution: {integrity: sha512-/f2Go4TognH/KvCISP7OUsHn85hT9nUkxxA9BEWxFn+Oj9o8ZNLm/40hdlgSLyuOimsrTKLUMEorQexp/aPQeA==}
     dependencies:
@@ -4591,6 +4620,10 @@ packages:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
     hasBin: true
     dev: false
+
+  /webextension-polyfill@0.10.0:
+    resolution: {integrity: sha512-c5s35LgVa5tFaHhrZDnr3FpQpjj1BB+RXhLTYUxGqBVN460HkbM8TBtEqdXWbpTKfzwCcjAZVF7zXCYSKtcp9g==}
+    dev: true
 
   /webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}

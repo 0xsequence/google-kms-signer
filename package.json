@@ -13,6 +13,7 @@
   "license": "ISC",
   "devDependencies": {
     "@0xsequence/auth": "^1.6.2",
+    "@0xsequence/provider": "^1.6.2",
     "@types/chai": "^4.3.11",
     "@types/chai-as-promised": "^7.1.8",
     "@types/mocha": "^10.0.6",
