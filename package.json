@@ -2,8 +2,9 @@
   "name": "@0xsequence/google-kms-signer",
   "version": "0.0.0",
   "description": "",
-  "main": "index.ts",
+  "main": "dist/index.js",
   "scripts": {
+    "build": "rm -f dist/*.d.ts && tsc --declaration --declarationMap --emitDeclarationOnly --declarationDir dist && esbuild index.ts --outdir=dist --bundle --minify --sourcemap --platform=node",
     "format": "prettier --write \"**/*.ts\"",
     "lint": "eslint --config .eslintrc.cjs --fix \"**/*.ts\"",
     "test": "NODE_OPTIONS='--import tsx' concurrently --kill-others --success first --hide 0 \"hardhat node\" \"wait-on http://127.0.0.1:8545 && mocha --extension ts\""
