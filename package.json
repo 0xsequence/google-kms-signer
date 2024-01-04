@@ -1,6 +1,6 @@
 {
   "name": "@0xsequence/google-kms-signer",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "an ethers.js- and sequence.js-compatible signer using Google Cloud Key Management Service keys",
   "main": "dist/index.js",
   "scripts": {
