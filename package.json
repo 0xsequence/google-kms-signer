@@ -22,9 +22,9 @@
   "author": "Horizon Blockchain Games Inc.",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@0xsequence/auth": "^1.6.2",
-    "@0xsequence/provider": "^1.6.2",
-    "@0xsequence/tests": "^1.6.2",
+    "@0xsequence/auth": "^2.2.11",
+    "@0xsequence/provider": "^2.2.13",
+    "@0xsequence/tests": "^2.2.11",
     "@types/chai": "^4.3.11",
     "@types/chai-as-promised": "^7.1.8",
     "@types/mocha": "^10.0.6",
@@ -37,7 +37,7 @@
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
-    "ethers": "5",
+    "ethers": "^6",
     "hardhat": "^2.19.4",
     "mocha": "^10.2.0",
     "prettier": "^3.1.1",
@@ -46,11 +46,15 @@
     "wait-on": "^7.2.0"
   },
   "dependencies": {
+    "@ethersproject/bytes": "^5.7.0",
+    "@ethersproject/properties": "^5.7.0",
+    "@ethersproject/signing-key": "^5.7.0",
+    "@ethersproject/transactions": "^5.7.0",
     "@google-cloud/kms": "^4.0.1",
     "asn1js": "^3.0.5",
     "pkijs": "^3.0.15"
   },
   "peerDependencies": {
-    "ethers": "5"
+    "ethers": "^6"
   }
 }
