@@ -1,11 +1,10 @@
-import { arrayify, joinSignature } from '@ethersproject/bytes'
-import { Deferrable } from '@ethersproject/properties'
-import { recoverPublicKey } from '@ethersproject/signing-key'
-import { UnsignedTransaction, serialize } from '@ethersproject/transactions'
+import type { Deferrable } from '@ethersproject/properties'
+import { type UnsignedTransaction, serialize } from '@ethersproject/transactions'
 import { KeyManagementServiceClient } from '@google-cloud/kms'
-import * as asn1js from 'asn1js'
-import { ethers } from 'ethers'
-import { PublicKeyInfo } from 'pkijs'
+import { ECDSASigValue } from '@peculiar/asn1-ecc'
+import { AsnConvert } from '@peculiar/asn1-schema'
+import { SubjectPublicKeyInfo } from '@peculiar/asn1-x509'
+import { ethers, getBytes, toBigInt, N as secp256k1N, recoverAddress as recoverAddressFn, toBeHex, Signature } from 'ethers'
 
 type GoogleKmsKey = {
     project: string
@@ -67,7 +66,7 @@ export class GoogleKmsSigner extends ethers.AbstractSigner {
     async signTypedData(
         domain: ethers.TypedDataDomain,
         types: Record<string, Array<ethers.TypedDataField>>,
-        value: Record<string, any>
+        value: Record<string, unknown>
     ): Promise<string> {
         const resolved = await ethers.TypedDataEncoder.resolveNames(domain, types, value, async name => {
             if (!this.provider) {
@@ -89,76 +88,66 @@ export class GoogleKmsSigner extends ethers.AbstractSigner {
         return new GoogleKmsSigner(this.path, this.client(), provider)
     }
 
-    private getPubkey(): Promise<string> {
+    private async getPubkey(): Promise<string> {
         if (!this.pubkey) {
-            this.pubkey = (async () => {
-                const [pubkey] = await this.client().getPublicKey({ name: this.identifier })
-                if (pubkey.algorithm !== 'EC_SIGN_SECP256K1_SHA256') {
-                    throw new Error(`algorithm is ${pubkey.algorithm}, expected EC_SIGN_SECP256K1_SHA256`)
-                }
-                if (!pubkey.pem) {
-                    throw new Error('missing public key pem')
-                }
+            const [pubkey] = await this.client().getPublicKey({ name: this.identifier })
+            if (pubkey.algorithm !== 'EC_SIGN_SECP256K1_SHA256') {
+                throw new Error(`algorithm is ${pubkey.algorithm}, expected EC_SIGN_SECP256K1_SHA256`)
+            }
+            if (!pubkey.pem) {
+                throw new Error('missing public key pem')
+            }
 
-                return decodePubkey(pubkey.pem)
-            })()
+            const PREFIX = '-----BEGIN PUBLIC KEY-----'
+            const SUFFIX = '-----END PUBLIC KEY-----'
+
+            const pemContent = pubkey.pem
+                .replace(PREFIX, '')
+                .replace(SUFFIX, '')
+                .replace(/\s/g, '')
+
+            const derBuffer = Buffer.from(pemContent, 'base64')
+
+            const publicKeyInfo = AsnConvert.parse(derBuffer, SubjectPublicKeyInfo)
+
+            const publicKeyBytes = new Uint8Array(publicKeyInfo.subjectPublicKey)
+
+            const keyBytes = publicKeyBytes[0] === 0x04 ? publicKeyBytes.slice(1) : publicKeyBytes
+
+            return `0x${Buffer.from(keyBytes).toString('hex')}`
         }
 
         return this.pubkey
     }
 
     private async signDigest(digest: ethers.BytesLike): Promise<string> {
-        const digestData = arrayify(digest)
+        const digestData = getBytes(digest)
 
         const [signature] = await this.client().asymmetricSign({ name: this.identifier, digest: { sha256: digestData } })
         if (!(signature.signature instanceof Uint8Array)) {
             throw new Error(`signature is ${typeof signature.signature}, expected Uint8Array`)
         }
 
-        return computeSignature(digestData, decodeSignature(signature.signature), await this.getPubkey())
+        const parsedSignature = AsnConvert.parse(
+            Buffer.from(signature.signature),
+            ECDSASigValue,
+        );
+
+        let s = toBigInt(new Uint8Array(parsedSignature.s));
+        s = s > secp256k1N / BigInt(2) ? secp256k1N - s : s;
+
+        const recoverAddress = recoverAddressFn(digest, {
+            r: toBeHex(toBigInt(new Uint8Array(parsedSignature.r)), 32),
+            s: toBeHex(s, 32),
+            v: 0x1b,
+        });
+
+        const address = await this.getAddress();
+
+        return Signature.from({
+            r: toBeHex(toBigInt(new Uint8Array(parsedSignature.r)), 32),
+            s: toBeHex(s, 32),
+            v: recoverAddress.toLowerCase() !== address.toLowerCase() ? 0x1c : 0x1b,
+        }).serialized;
     }
-}
-
-function decodePubkey(pem: string): string {
-    const PREFIX = '-----BEGIN PUBLIC KEY-----\n'
-    const SUFFIX = '-----END PUBLIC KEY-----\n'
-
-    if (!pem.startsWith(PREFIX)) {
-        throw new Error('missing public key prefix')
-    }
-    if (!pem.endsWith(SUFFIX)) {
-        throw new Error('missing public key suffix')
-    }
-
-    pem = pem.slice(PREFIX.length, pem.length - SUFFIX.length)
-    pem = pem.replace(/\s/, '')
-
-    const pubkey = PublicKeyInfo.fromBER(Buffer.from(pem, 'base64'))
-    return ethers.hexlify(pubkey.subjectPublicKey.valueBlock.valueHexView)
-}
-
-function decodeSignature(ber: Uint8Array): { r: bigint; s: bigint } {
-    const SCHEMA = new asn1js.Sequence({ value: [new asn1js.Integer({ name: 'r' }), new asn1js.Integer({ name: 's' })] })
-
-    const { verified, result } = asn1js.verifySchema(ber, SCHEMA)
-    if (!verified) {
-        throw new Error('signature does not conform to schema')
-    }
-
-    return { r: result.r.toBigInt(), s: result.s.toBigInt() }
-}
-
-function computeSignature(digest: ethers.BytesLike, signature: { r: bigint; s: bigint }, pubkey: string): string {
-    const r = ethers.toBeHex(signature.r)
-    const s = ethers.toBeHex(signature.s)
-
-    for (const v of [27, 28]) {
-
-        if (recoverPublicKey(digest, { r, s, v }) === pubkey) {
-            const signature = joinSignature({ r, s, v })
-            return signature
-        }
-    }
-
-    throw new Error('invalid signature for public key')
 }
