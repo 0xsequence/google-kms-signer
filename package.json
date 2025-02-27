@@ -51,10 +51,13 @@
     "@ethersproject/signing-key": "^5.7.0",
     "@ethersproject/transactions": "^5.7.0",
     "@google-cloud/kms": "^4.0.1",
+    "@peculiar/asn1-ecc": "^2.3.15",
+    "@peculiar/asn1-schema": "^2.3.15",
+    "@peculiar/asn1-x509": "^2.3.15",
     "asn1js": "^3.0.5",
     "pkijs": "^3.0.15"
   },
   "peerDependencies": {
-    "ethers": "^6"
+    "ethers": "^6.13.5"
   }
 }
