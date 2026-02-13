@@ -19,7 +19,7 @@
     "ethers",
     "ethers.js"
   ],
-  "author": "Horizon Blockchain Games Inc.",
+  "author": "Sequence Platforms ULC",
   "license": "Apache-2.0",
   "devDependencies": {
     "@0xsequence/auth": "^2.2.11",
