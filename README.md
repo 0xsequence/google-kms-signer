@@ -1,3 +1,11 @@
+<!-- archived-repository-notice -->
+> [!WARNING]
+> **This repository is archived and no longer maintained.**
+>
+> It is part of the legacy Sequence stack and is kept here for reference only.
+> It will not receive bug fixes, security patches or releases, and packages,
+> images or deployments built from it are not supported.
+
 # google-kms-signer
 
 [GoogleKmsSigner](https://github.com/0xsequence/google-kms-signer) is an [ethers.js](https://ethers.org)- and [sequence.js](https://github.com/0xsequence/sequence.js)-compatible signer using [Google Cloud Key Management Service](https://cloud.google.com/security/products/security-key-management) keys
